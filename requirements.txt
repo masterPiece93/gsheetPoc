@@ -1,0 +1,14 @@
+# 
+# python 3.12 compliant
+#
+
+# server framework
+Django==5.2.5
+# .env parsing
+django-environ
+
+# App:gauth
+-r gauth/requirements.txt
+
+# App:gsheets
+-r gsheets/requirements.txt

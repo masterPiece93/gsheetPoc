@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sheets UI</title>
+    
+</head>
+<body>
+    <h1 style="text-align: center;">Sheets</h1>
+    <div style="background: antiquewhite;margin: 1em;">
+        <p style="padding: 1em;
+        text-align: center;
+        font-family: sans-serif;"
+        >Fetch Data Stratagy</p>
+        <form style="
+        margin: 1em;
+        background: antiquewhite;
+        display: flex;
+        flex-direction: row;
+        justify-content: space-evenly;
+        padding: 1em;
+        "
+        >
+            <div>
+                <input type="radio" id="option1" name="fetchBy" value="ALL">
+                <label for="option1">ALL</label><br>
+            </div>
+            
+            <div>
+                <input type="radio" id="option2" name="fetchBy" value="GID">
+                <label for="option2">GID</label><br>
+            </div>
+
+            <div>
+                <input type="radio" id="option3" name="fetchBy" value="TITLE">
+                <label for="option3">TITLE</label>
+            </div>
+
+            <div>
+                <input type="radio" id="option4" name="fetchBy" value="INDEX">
+                <label for="option4">INDEX</label>
+            </div>
+
+        </form>
+    </div>
+
+    <div style="
+        display: flex;
+        background: antiquewhite;
+        margin: 1em;
+        padding: 1em;
+        "
+    >
+        <div style="
+            flex: 5;
+            "
+        >
+            <label for="sheet-url" 
+                style="
+                font-size: larger;
+                "
+            >URL :</label>
+            <input type="url" name="sheet-url" id="sheet-url-input" placeholder="Enter sheet url" style="width: 80%;">
+            <input type="button" value="Read" id="readBtn">
+        </div>
+        <div style="flex: 1;">
+            <input type="button" value="Authenticate" 
+                style="
+                font-size: medium;
+                background: lightblue;
+                "
+                id="authenticateBtn"
+            >
+        </div>
+    </div>
+    <p id="loading-spinner" style="display: none; position: fixed; color: brown; top: 50%; left: 50%;
+    transform: translate(-50%, -50%);"> Fetching ... </p>
+    <pre id="result" style="
+        margin: 1em;
+        background: beige;
+        color: brown;
+        padding: 0.5em;
+        "
+    >
+    </pre>
+<script>
+    document.getElementById("authenticateBtn").addEventListener("click", function() {
+        window.open("{{ context_data.auth_url }}", "_blank"); // Replace with your desired URL
+    });
+
+    const fetchButton = document.getElementById('readBtn');
+    const resultDiv = document.getElementById('result');
+
+    fetchButton.addEventListener('click', fetchData);
+    const loader = document.getElementById('loading-spinner'); 
+
+    async function fetchData() {
+
+        let sheet_url = document.getElementById("sheet-url-input")
+        const baseUrl = '{{ context_data.api.read_all_sheet }}'
+        const params = {
+            sheetUrl: sheet_url.value,
+            fetchBy: getSelectedRadioValue()
+        };
+        // Remove `fetchBy` queryparam if it's value is null
+        if (params.fetchBy == null) {
+            delete params.fetchBy
+        }
+        const queryParams = new URLSearchParams(params);
+        const urlWithParams = `${baseUrl}?${queryParams}`;
+        
+        resultDiv.textContent = "..."
+        loader.style.display = 'block';
+        try {
+            const response = await fetch(urlWithParams); // Replace with your API endpoint
+            console.log(response.status)
+            console.log(response.status === 400)
+            if (response.status === 401) {
+                console.error('Authentication required or invalid credentials.');
+                resultDiv.textContent = "Please Authenticate"
+            }
+            else if (response.status === 400) {
+                console.error('Invalid sheet request');
+                const data = await response.json()
+                resultDiv.textContent = JSON.stringify(data.errors, null, 4)
+            }
+            else if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            if (response.ok){
+                const data = await response.json();
+                resultDiv.textContent = JSON.stringify(data.data, null, 4); // Display fetched data
+            }
+
+        } catch (error) {
+            console.error('Error fetching data:', error);
+            resultDiv.textContent = 'Error fetching data.';
+        } finally {
+            loader.style.display = 'none'; // Or remove the class 'show-loader'
+        }
+    }
+
+    function getSelectedRadioValue() {
+        // Assuming your radio buttons have the name "gender"
+        const selectedRadio = document.querySelector('input[name="fetchBy"]:checked');
+
+        if (selectedRadio) {
+            const value = selectedRadio.value;
+            console.log("Selected fetchBy:", value);
+            return value;
+        } else {
+            console.log("No fetchBy selected.");
+            return null;
+        }
+    }
+</script>
+</body>
+</html>
