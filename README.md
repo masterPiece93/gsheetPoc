@@ -37,4 +37,12 @@ python3 manage.py runserver localhost:5000
 ##### Locally 
 > git config credential.helper 'cache --timeout=3600'
 
-NOTE : Git credentials.helper stores credentials in running process memory .
+NOTE : 
+```
+Git credentials.helper `cache` option stores credentials in running process's memory .
+For e.g:
+    If you are operating GIT commands on Terminal/cmd , then these
+    command stores the credentials in the memory of that terminal/cmd
+    process .
+    Once you exit that process , the `cache` is lost .
+```
