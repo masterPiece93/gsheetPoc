@@ -30,6 +30,9 @@ python3 manage.py runserver localhost:5000
         ```sh
         python3 manage.py createsuperuser
         ```
+---
+
+#### Notes on GIT
 
 ##### Globally 
 > git config --global credential.helper 'cache --timeout=3600'
