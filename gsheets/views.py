@@ -8,15 +8,16 @@ from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 from google.auth.exceptions import RefreshError
 import gsheets.utils as google_sheet_utils
+from typing import Tuple
 
-def is_authenticated(session):
+def check_gauth_authentication(session) -> Tuple[bool, object]:
 
     credentials_session_key = settings.CREDENTIALS_SESSION_KEY_NAME
 
     if credentials_session_key not in session:
         # request.session['final_redirect'] = url_for('ssr_ui.google-sheets.all_sheets_data_api_request')
         # return redirect(url_for('auth.login'))
-        return None
+        return False, None
     
     # Load credentials from the session.
     credentials = Credentials(
@@ -25,9 +26,9 @@ def is_authenticated(session):
     if not credentials.valid:
         # session['final_redirect'] = url_for('ssr_ui.google-sheets.all_sheets_data_api_request')
         # return redirect(url_for('auth.login'))
-        return None
+        return False, None
     
-    return credentials
+    return True, credentials
 
 # Create your views here.
 
@@ -73,9 +74,9 @@ def read_sheet_data(request):
         response["errors"] = ["sheeId or sheetUrl is required"]
         return JsonResponse(response, status=400)
     
-    credentials = is_authenticated(request.session)
+    is_authenticated, credentials = check_gauth_authentication(request.session)
 
-    if not credentials:
+    if not is_authenticated:
         response["message"] = "unauthenticated"
         return JsonResponse(response, status=401)
     
@@ -99,4 +100,3 @@ def read_sheet_data(request):
         return JsonResponse(response, status=401)
     
     return JsonResponse(response, status=200)
-    

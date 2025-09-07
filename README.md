@@ -32,6 +32,13 @@ python3 manage.py runserver localhost:5000
         ```
 ---
 
+#### TODO :
+
+- when we add google sheet's sharable url , `gid` is not included in it , hence , if we select GID option , it'll give error , hence we can add an enhencement ( already part of office project )
+    - replace `extract_id_gid` function with a `validate_sheet_url` function and when gid is not 
+        available , hence, operate accordingly 
+---
+
 #### Notes on GIT
 
 ##### Globally 

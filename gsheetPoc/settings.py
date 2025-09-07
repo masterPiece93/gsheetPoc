@@ -133,7 +133,7 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
+os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1' # Only For Local Development
 
 # Gauth App Variables
 GOOGLE_CLIENT_ID=env("GOOGLE_CLIENT_ID")
